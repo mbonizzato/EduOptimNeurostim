@@ -1,0 +1,101 @@
+{
+  "seed": 0,
+  "output_path": "output/rat_mapping_4D_spinal_stimulation",
+  "input_space": {
+    "frequency": {
+      "a": {
+        "mu": 9,
+        "sigma": 1
+      },
+      "b": 1,
+      "low": 3,
+      "high": 10,
+      "scaler": {
+        "min": 0.0,
+        "max": 1.0
+      }
+    },
+    "duration": {
+      "a": {
+        "mu": 8.5,
+        "sigma": 0.5
+      },
+      "b": 1,
+      "low": 5,
+      "high": 10,
+      "scaler": {
+        "min": 0.0,
+        "max": 1.0
+      }
+    },
+    "timing": {
+      "a": {
+        "mu": 8,
+        "sigma": 1
+      },
+      "b": 1,
+      "low": 4,
+      "high": 10,
+      "scaler": {
+        "max": 1.0
+      }
+    },
+    "position": ["0.7 +/- 0.2", 1.0]
+  },
+  "toy": {
+    "n": 6,
+    "h_min": {
+      "mu": 0.9,
+      "sigma": 0.1
+    },
+    "h_max": {
+      "mu": 3.0,
+      "sigma": 0.5
+    }
+  },
+  "data": {
+    "dataset_path": "data/rat",
+    "selected_muscles": null
+  },
+  "preprocessing": {
+    "normal_noise": {
+      "mu": 0.0,
+      "sigma": 0.5
+    },
+    "lower_bound": 0.5,
+    "upper_bound": 4.0
+  },
+  "prior": {
+    "path": null,
+    "scale": null
+  },
+  "acquisition": {
+    "name": "ucb",
+    "kappa": {
+      "default": 4.0,
+      "values": [2.6, 2.9, 3.2, 3.5, 3.8, 4.1, 4.3, 4.5, 4.8],
+      "find_best": true
+    }
+  },
+  "optimization": {
+    "name": "gpbo",
+    "max_queries": 30,
+    "n_repetitions": 30,
+    "n_random_steps": {
+      "default": 1
+    },
+    "kernel_order": 5,
+    "noise_min": {
+      "default": 0.01
+    },
+    "noise_max": {
+      "default": 2
+    },
+    "rho_high": {
+      "default": 2.0
+    },
+    "rho_low": {
+      "default": 0.1
+    }
+  }
+}

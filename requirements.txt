@@ -1,0 +1,11 @@
+scipy~=1.4.1
+numpy~=1.17.2
+gpy~=1.9.9
+tqdm~=4.45.0
+matplotlib~=3.4.2
+pandas~=1.2.5
+tdt~=0.5.3
+torch~=1.10.2
+gpytorch~=1.6.0
+
+tested with Python 3.8 and 3.9.12
