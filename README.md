@@ -5,15 +5,15 @@ Educational material.
 Companion code for the following paper : [Link to paper available upon publication]
 
 Please cite the present code as:
-Bonizzato M.&, Macar U.&, Guay-Hottin R., Choinière L., Lajoie G., Dancause N. 2021. “EduOptimNeurostim”, GitHub.  https://github.com/mbonizzato/EduOptimNeurostim/. \
-&, these authors equally contributed to the repository concept and material.
+Bonizzato M.<sup>&</sup>, Macar U.<sup>&</sup>, Guay-Hottin R., Choinière L., Lajoie G., Dancause N. 2021. “EduOptimNeurostim”, GitHub.  https://github.com/mbonizzato/EduOptimNeurostim/. \
+<sup>&</sup>, these authors equally contributed to the repository concept and material.
 
 
 ## Usage notes
 
-The library is built around main.py and a JSON file containing all the necessary parameters (config folder). 
-We built a series of tutorials to help navigate all the available features and design library calls (tutorials folder).
-A few utilities for data downloading and result visualization complement this release (scripts folder).
+The library is built around main.py and a JSON file containing all the necessary parameters ([config](/config) folder). 
+We built a series of tutorials to help navigate all the available features and design library calls ([tutorials](/tutorials) folder).
+A few utilities for data downloading and result visualization complement this release ([scripts](/scripts) folder).
 
 You may want to run our Tutorial 1 first.
 
@@ -29,7 +29,18 @@ https://gitforwindows.org/
 
 ``` git clone https://github.com/mbonizzato/EduOptimNeurostim.git ```
 
-4. Open the notebook Experiment 1 in Jupyter Notebook and enjoy the tutorial!
+4. You will need python 3.X to run the code. We suggest to create a virtual environment:
+
+```
+python3.X -m venv <virtual-environment-name>
+source <virtual-environment-name>/bin/activate
+```
+
+5. Install the requirements:
+
+  ``` pip install -r requirements.txt ```
+
+6. Open the notebook Experiment 1 in Jupyter Notebook and enjoy the tutorial!
 
 ## Data
 
@@ -39,8 +50,8 @@ While running the provided tutorial notebooks, the dataset will be automatically
 Extensive dataset explanation is available at the project's Wiki : https://osf.io/54vhx/wiki/home/
 
 Please cite the dataset as:
-Bonizzato M., Massai E.&, Côté S.&, Quessy S., Martinez M., and Dancause N. 2021. “OptimizeNeurostim” OSF. osf.io/54vhx. \
-&, these authors equally contributed to the dataset.
+Bonizzato M., Massai E.<sup>&</sup>, Côté S.<sup>&</sup>, Quessy S., Martinez M., and Dancause N. 2021. “OptimizeNeurostim” OSF. osf.io/54vhx. \
+<sup>&</sup>, these authors equally contributed to the dataset.
 
 
 
