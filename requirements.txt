@@ -7,5 +7,3 @@ pandas~=1.2.5
 tdt~=0.5.3
 torch~=1.10.2
 gpytorch~=1.6.0
-
-tested with Python 3.8 and 3.9.12
