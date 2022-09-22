@@ -24,7 +24,7 @@ https://www.anaconda.com/products/distribution
 
 2. The notebooks contain !bash commands to download the dataset. If you wish to use these, you will need a git bash.
 https://gitforwindows.org/
-If you prefere to avoid installing this, you can manually download the datasets (see Data section below). The bash routine would download them in a "data" folder, with "rat" and "nhp" subfolders, we suggest to maintain this structure to minimize changes to the notebook code.
+If you prefer to avoid installing this, you can manually download the datasets (see Data section below). The bash routine would download them in a "data" folder, with "rat" and "nhp" subfolders, we suggest to maintain this structure to minimize changes to the notebook code.
 
 3. Clone the repository.
 
