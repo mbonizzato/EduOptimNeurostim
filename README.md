@@ -29,7 +29,7 @@ https://gitforwindows.org/
 
 ``` git clone https://github.com/mbonizzato/EduOptimNeurostim.git ```
 
-4. You will need python 3.7.4 to run the code. We suggest to create a new virtual environment.
+4. You will need python 3.7.4 to run the code. We suggest to create a new virtual environment with this version.
 
 5. After activating the environment, install the requirements:
 
