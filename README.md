@@ -5,7 +5,7 @@ Educational material.
 Companion code for the following paper : [Link to paper available upon publication]
 
 Please cite the present code as:
-Bonizzato M.&, Macar U.&, Guay-Hottin R., Choinière L., Lajoie G., Dancause N. 2021. “EduOptimNeurostim”, GitHub.  https://github.com/mbonizzato/EduOptimNeurostim/.
+Bonizzato M.&, Macar U.&, Guay-Hottin R., Choinière L., Lajoie G., Dancause N. 2021. “EduOptimNeurostim”, GitHub.  https://github.com/mbonizzato/EduOptimNeurostim/. \
 &, these authors equally contributed to the repository concept and material.
 
 
@@ -39,7 +39,7 @@ While running the provided tutorial notebooks, the dataset will be automatically
 Extensive dataset explanation is available at the project's Wiki : https://osf.io/54vhx/wiki/home/
 
 Please cite the dataset as:
-Bonizzato M., Massai E.&, Côté S.&, Quessy S., Martinez M., and Dancause N. 2021. “OptimizeNeurostim” OSF. osf.io/54vhx.
+Bonizzato M., Massai E.&, Côté S.&, Quessy S., Martinez M., and Dancause N. 2021. “OptimizeNeurostim” OSF. osf.io/54vhx. \
 &, these authors equally contributed to the dataset.
 
 
