@@ -20,7 +20,7 @@ You may want to run our Tutorial 1 first.
 ### Getting started
 
 1. Make sure you are equipped to read an IPYNB file, a notebook document created by Jupyter Notebook.
-https://www.anaconda.com/products/distribution
+https://jupyter.org/install
 
 2. The notebooks contain !bash commands to download the dataset. If you wish to use these, you will need a git bash.
 https://gitforwindows.org/
