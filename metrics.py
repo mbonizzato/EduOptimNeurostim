@@ -40,13 +40,19 @@ class Metrics(object):
         """
         def lower_and_upper_bounds(arr):
             """Returns lower and upper bounds"""
-            # Preprocessing: take the mean across repetitions for all measurements
-            arr = np.mean(arr, axis=2)
+            # nm = num. muscles
+            # Preprocessing: if nm > 1, take the mean across repetitions for all measurements
+            if arr.shape[1] > 1:
+                arr = np.mean(arr, axis=2)
+            # Preprocessing: if nm = 1, take the single muscle values
+            elif arr.shape[1] == 1:
+                arr = arr[:, 0, :, :]
 
-            # Compute the mean and standard deviation across dataset dimension
+            # Compute the mean and std across dataset (nm > 1) or repetitions (nm = 1) dimension
             mean, std = np.mean(arr, axis=1), np.std(arr, axis=1)
 
-            # Compute standard error measurement (SEM): divide std by square root of dataset length
+            # SEM = standard error measurement
+            # Compute SEM: divide std by sqrt of dataset length (nm > 1) or num repetitions (nm = 1)
             sem = std / np.sqrt(arr.shape[1])
 
             # Compute lower and upper bounds
@@ -73,6 +79,7 @@ class Metrics(object):
                 hyperparam_keys = self.config.hyperparam_options.hyperparam_keys[0]
 
                 # Get the best hyperparam values and save them in a .pkl
+                
                 if self.config.find_best_wrt == 'exploration':
                     best_hyperparam_index = np.argmax(self.explore_perf_agg)
                 elif self.config.find_best_wrt == 'exploitation':
