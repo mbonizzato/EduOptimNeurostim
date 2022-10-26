@@ -40,6 +40,7 @@ class Config(object):
         self.response_type = 'all' if 'response_type' not in config['data'] else config['data']['response_type']
         self.validation = args.validation or ('validation' in config and config['validation'])
         self.find_best_wrt = 'exploration' if 'find_best_wrt' not in config else config['find_best_wrt']
+        self.step_by_step = args.step_by_step
 
         # Process input space if applicable
         self.input_space = None if 'input_space' not in config else config['input_space']

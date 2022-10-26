@@ -32,7 +32,15 @@ parser.add_argument('--n_repetitions', '-nr', type=int, default=None)
 parser.add_argument('--validation', '-val', default=False, action='store_true')
 parser.add_argument('--gpu', '-gpu', default=False, action='store_true')
 parser.add_argument('--show_warnings', '-sw', default=False, action='store_true', help='Enable for debugging')
+parser.add_argument('--step_by_step', '-sbs', default=False)
+
 args = parser.parse_args()
+
+if args.step_by_step and (args.n_muscles!=1 or args.n_repetitions!=1):
+    args.n_muscles=1
+    args.n_repetitions=1
+    print('Step by step demo is only available for n_muscles= 1 and n_repetitions= 1.')
+    print('Setting these values to 1 ...')
 
 # Silence run-time warnings unless explicitly specified
 if not args.show_warnings:
@@ -66,6 +74,16 @@ metrics = Metrics(config=config, shape=metrics_shape, status=status)
 # Store all channel value selections and algorithm predictions in NumPy arrays
 channel_values_arr = np.empty(metrics_shape + (system.n_dim, ))
 y_mu_arr = np.empty(metrics_shape[:-1] + (system.n_channel, ))
+
+
+# Store step by step data in NumPy arrays
+if config.step_by_step:
+    
+    sbs_save_query = np.array([1,4,8,12,16,20,24,28,31])
+    sbs_arr = np.empty([len(sbs_save_query), 3, system.n_channel])
+    sbs_query_idx = np.empty([max_queries,2])
+    sbs_best_query = np.empty([max_queries,2])
+    
 
 # Iterate over hyperparameters if applicable
 for hyperparam_index, hyperparam_option in enumerate(config.hyperparam_options):
@@ -189,14 +207,37 @@ for hyperparam_index, hyperparam_option in enumerate(config.hyperparam_options):
                     # For the specified number of steps or for extensive search, sample randomly
                     elif query_index < config.n_random_steps or config.algorithm == 'extensive':
                         query = random_queries[query_index]
+                        
+                        if config.step_by_step:
+                            sbs_query_idx[query_index] = system.ch2xy[query]
+                            
                     # For the rest, acquire next query based on the acquisition function
                     elif config.algorithm == 'gpbo' and config.acquisition == 'ucb':
                         # UCB acquisition
                         acquisition_map = y_mu + config.kappa * np.nan_to_num(np.sqrt(y_var))
+                        
+                        if config.step_by_step and query_index in sbs_save_query:
+                            
+                            if query_index==1:
+                                 i_sbs= 0
+                            elif query_index==31:
+                                i_sbs=8   
+                            else: 
+                                i_sbs= int(query_index/4)
+                            
+                            sbs_arr[i_sbs,0,:]= y_mu.flatten()*max_response
+                            sbs_arr[i_sbs,1,:]= np.nan_to_num(np.sqrt(y_var)).flatten()
+                            sbs_arr[i_sbs,2,:]= acquisition_map.flatten()
+                            
+                                                    
                         # Get next query based on the acquisition map
                         query = np.where(acquisition_map.flatten() == np.max(acquisition_map.flatten()))
                         # Randomly choose a query if there are multiple max values
                         query = query[np.random.randint(len(query))][0]
+                        
+                        if config.step_by_step:
+
+                            sbs_query_idx[query_index] = system.ch2xy[query]
 
                     # Update channel value matrix with the current corresponding values (i.e., xy)
                     channel_values_arr[hyperparam_index, muscle_index, run_index, repetition_index, query_index, :] = system.ch2xy[query]
@@ -350,7 +391,7 @@ for hyperparam_index, hyperparam_option in enumerate(config.hyperparam_options):
                                                         full_cov=False,
                                                         Y_metadata=None,
                                                         include_likelihood=True)
-
+                            
                         y_mu_arr[hyperparam_index, muscle_index, run_index, repetition_index, :] = y_mu.flatten()
 
                         # Update kernel hyperparameters for non-GPU version
@@ -379,7 +420,10 @@ for hyperparam_index, hyperparam_option in enumerate(config.hyperparam_options):
                         best_query = np.nanargmax(np.nanmean(buckets, axis=0))
 
                     # Update best queries list
-                    Q_best.append(best_query)
+                    Q_best.append(best_query)                    
+                    
+                    if config.step_by_step:
+                        sbs_best_query[query_index]= system.ch2xy[best_query]
 
                 if status == 'offline':
                     # Get min-max values for normalization
@@ -423,6 +467,36 @@ if system.n_dim == 2:
     for index in itertools.product(*[range(dim) for dim in system.shape]):
         if index not in [tuple([xi - 1 for xi in x]) for x in system.ch2xy.tolist()]:
             y_mu_mapped_arr[(slice(None), slice(None), slice(None)) + index] = np.nan
+            
+            
+if config.step_by_step:
+    
+    # Map `sbs_arr` using `ch2xy` to the actual dimensions for each muscle
+    sbs_mapped_arr = np.empty(tuple(sbs_arr.shape[:-1]) + tuple(system.shape))
+    for query_index in range(sbs_arr.shape[0]):
+        for cond_index in range(sbs_arr.shape[1]):
+            sbs_mapped = np.empty(system.shape)
+            for channel_index in range(sbs_arr.shape[2]):
+                dim_values = system.ch2xy[channel_index, :]
+                dim_index = tuple(list(set(system.ch2xy[:, i].tolist())).index(v) for i, v in enumerate(dim_values))
+                sbs_mapped[dim_index] = sbs_arr[query_index, cond_index,channel_index]
+            sbs_mapped_arr[query_index, cond_index, :] = sbs_mapped
+
+    # Post-process the sbs_mapped to only show valid outputs for valid regions
+    if system.n_dim == 2:
+        for index in itertools.product(*[range(dim) for dim in system.shape]):
+            if index not in [tuple([xi - 1 for xi in x]) for x in system.ch2xy.tolist()]:
+                sbs_mapped_arr[(slice(None), slice(None), slice(None)) + index] = np.nan     
+                
+    
+# Save step by step data
+
+if config.step_by_step:
+    np.save(os.path.join(config.output_path, 'sbs_mapped_arr.npy'), sbs_mapped_arr)
+    np.save(os.path.join(config.output_path, 'sbs_save_query.npy'), sbs_save_query)
+    np.save(os.path.join(config.output_path, 'sbs_query_idx.npy'), sbs_query_idx.astype(int))
+    np.save(os.path.join(config.output_path, 'sbs_best_query.npy'), sbs_best_query.astype(int))
+
 
 # Save key variables, parameters, and results
 np.save(os.path.join(config.output_path, 'y_mu_mapped_arr.npy'), y_mu_mapped_arr)
