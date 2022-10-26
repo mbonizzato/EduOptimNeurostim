@@ -23,18 +23,23 @@ for i in range(sbs_mapped_arr.shape[0]):
             #plot ground truth
             ax[j,i].imshow(y_mu_mapped_arr, cmap='OrRd')
             
-            for q in range(sbs_save_query[i]):
-                
-                if  i<4 or not (sbs_query_idx[q]== sbs_best_query[q]).all():
+            if i<2:
+                for q in range(sbs_save_query[i]):  
                     # plot queried coordinates as black dot
-                    circle1 = plt.Circle((sbs_query_idx[q,1]-1, sbs_query_idx[q,0]-1),
-                                     0.1, color='k')
+                    circle1 = plt.Circle((sbs_query_idx[q,1]-1, sbs_query_idx[q,0]-1), 0.1, color='k')
                     ax[j,i].add_patch(circle1)
-            if i>=4:
+                
+            else:
+                for q in np.linspace(sbs_save_query[i]-4,sbs_save_query[i]-1,4).astype(int):
+                    # plot last 4 queried coordinates as black dot
+                    circle1 = plt.Circle((sbs_query_idx[q,1]-1, sbs_query_idx[q,0]-1), 0.1, color='k')
+                    ax[j,i].add_patch(circle1)      
+            
+                if i>=4:
                 # plot best predicted coordinates as green dot (only starting from the 16th query)
-                circle2 = plt.Circle((sbs_best_query[sbs_save_query[i],1]-1, sbs_best_query[sbs_save_query[i],0]-1),
+                    circle2 = plt.Circle((sbs_best_query[int(sbs_save_query[i]-1),1]-1, sbs_best_query[int(sbs_save_query[i]-1),0]-1),
                                      0.2, color='g') 
-                ax[j,i].add_patch(circle2)
+                    ax[j,i].add_patch(circle2)
         else:
             if j==1:
                 #plot estimated map                
