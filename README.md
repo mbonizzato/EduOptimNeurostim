@@ -2,7 +2,7 @@
 GP-BO optimization of neurostimulation. 
 Educational material.
 
-Companion code for the following paper : [Link to paper available upon publication]
+Companion code for the following paper : https://www.cell.com/cell-reports-medicine/fulltext/S2666-3791(23)00118-0#secsectitle0255
 
 Please cite the present code as:
 Bonizzato M.<sup>&</sup>, Macar U.<sup>&</sup>, Guay-Hottin R., Choinière L., Lajoie G., Dancause N. 2022. "EduOptimNeurostim", GitHub.  https://github.com/mbonizzato/EduOptimNeurostim/. \
