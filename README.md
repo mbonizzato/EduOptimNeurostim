@@ -82,7 +82,7 @@ Bonizzato M., Massai E.<sup>&</sup>, Côté S.<sup>&</sup>, Quessy S., Martinez 
 <sup>&</sup>, these authors equally contributed to the dataset.
 ​
 ​
-### Config file variables
+## Config file variables
 ​
 1. **seed**:
     - Controls: Seeds randomness in the algorithm for reproducibility. 
@@ -109,9 +109,9 @@ Bonizzato M., Massai E.<sup>&</sup>, Côté S.<sup>&</sup>, Quessy S., Martinez 
         - Controls: Specifies throught which api the online is made available.
         - Possible values: "synapse"
 
-​4. **eletrode_mapping_path**:
-        - Controls: Specifies where to find a .json file containing the tdt channels and their corresponding coordinate on the physical electrode array.
-        - Possible values: A path to a .json file containing a mapping formated as in config/ch2xy_online.json.
+4. **eletrode_mapping_path**:
+    - Controls: Specifies where to find a .json file containing the tdt channels and their corresponding coordinate on the physical electrode array. 
+    - Possible values: A path to a .json file containing a mapping formated as in config/ch2xy_online.json.
 
 5. **prior**:
     - **path**:
@@ -127,7 +127,7 @@ Bonizzato M., Massai E.<sup>&</sup>, Côté S.<sup>&</sup>, Quessy S., Martinez 
         - Controls: The acquisition function to use to select the next query to execute.
         - Possible values: "ucb"
    
-    - **kappa**: Parameter controling the trade-off between exploration and exploitation in the acquisition function UCB. [Description]
+    - **kappa**: Parameter controling the trade-off between exploration and exploitation in the acquisition function UCB.
         - **default**:
             - Controls: The default value of kappa to use when running the algorithm.
             - Possible values: Floats
