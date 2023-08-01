@@ -42,6 +42,9 @@ class Config(object):
         self.find_best_wrt = 'exploration' if 'find_best_wrt' not in config else config['find_best_wrt']
         self.step_by_step = args.step_by_step
 
+        # Mapping electrodes from TDT channel to electrode coordinates online
+        self.mapping_electrodes_online = None if 'eletrode_mapping_path' not in config else config['eletrode_mapping_path']
+
         # Process input space if applicable
         self.input_space = None if 'input_space' not in config else config['input_space']
         self.process_input_space()

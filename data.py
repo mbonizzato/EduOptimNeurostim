@@ -1,4 +1,5 @@
 import os
+import json
 import random
 from scipy.io import loadmat
 from online import *
@@ -37,9 +38,6 @@ class OnlineMuscle(object):
         # Send query to online system
         for i, param in enumerate(list(self.config.input_space.keys())):
             online_api.set_param(param, values[i])
-
-        # Set delay
-        online_api.delay(150)
 
         # Trigger stimulation
         online_api.stimulate()
@@ -98,6 +96,7 @@ class System(object):
         self.n_channel = np.prod(self.shape)
 
         # Create channel to dim. value (`ch2xy`) and channel to dim. index (`ch2idx`) mappings
+        # The values here serve as placeholder 
         self.ch2xy = np.empty((self.n_channel, self.n_dim))
         self.ch2idx = np.empty((self.n_channel, self.n_dim), dtype=np.int)
         for i in range(self.n_channel):
@@ -113,7 +112,15 @@ class System(object):
             for i in range(self.config.toy_n):
                 muscle = SyntheticMuscle(config=self.config)
                 self.muscles.append(muscle)
-        else:
+        else:      
+            #If online, load the tdt channel to electrode coordinate ch2xy from json file
+            assert os.path.exists(config.mapping_electrodes_online) and config.mapping_electrodes_online.endswith('.json')
+            with open(config.mapping_electrodes_online) as f:
+                online_mapping = json.load(f)
+            #Overwrite values defined above
+            self.ch2xy = np.array(online_mapping['ch2xy'],dtype=np.uint8)
+            self.ch2idx = self.ch2xy - 1 
+
             muscle = OnlineMuscle(config=self.config)
             self.muscles.append(muscle)
 

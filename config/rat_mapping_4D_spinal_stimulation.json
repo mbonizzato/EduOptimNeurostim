@@ -84,7 +84,6 @@
     "n_random_steps": {
       "default": 1
     },
-    "kernel_order": 5,
     "noise_min": {
       "default": 0.01
     },

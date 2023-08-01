@@ -15,14 +15,14 @@ class SynapseAPI(object):
     """Provided class for interfacing between Python and Synapse"""
     def __init__(self):
         self.stimulator = 'eStim1'  # name of the stimulator, is configuration-specific
-        self.emg_buffers = [f'buffer_{i}' for i in range(1, 8)]  # buffers to read responses from
+        self.emg_buffers = [f'buffer_{i}' for i in range(1, 4)]  # buffers to read responses from
         self.emg_index = 1  # which buffer to read the final response from
         self.baseline_index = 4  # baseline index for aggregating responses from a single buffer
         self.synapse_api = tdt.SynapseAPI('localhost')  # API for connecting to Synapse
         self.previous_response = None  # stores the previous response from the system
 
         self.read_response_method = 'delay'  # choose between 'delay' and 'loop'
-        self.read_response_delay = 0.5  # delay (seconds) for response reading
+        self.read_response_delay = 0.7  # delay (seconds) for response reading
         self.read_response_time_limit = 30  # time-limit (seconds) for response reading while loop
 
         # `params2fn` is a dictionary mapping param keys to functions for setting the param
