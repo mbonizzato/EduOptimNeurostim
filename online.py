@@ -1,6 +1,7 @@
 import tdt
 import time
 import numpy as np
+from scipy.signal import butter,filtfilt
 
 
 def get_online_api(config):
@@ -11,13 +12,43 @@ def get_online_api(config):
         raise NotImplementedError('API not implemented for %s' % config.online_api)
 
 
+def butter_filter(type_,data, cutoff, fs, order):
+    """Function for applying a parametrized filter on a signal"""
+    nyq = 0.5 * fs
+    normal_cutoff = cutoff / nyq
+    # Get the filter coefficients
+    if type_ == 'high':
+        b, a = butter(order, normal_cutoff, btype='highpass', analog=False)
+    elif type_ == 'low':
+        b, a = butter(order, normal_cutoff, btype='lowpass', analog=False) 
+
+    y = filtfilt(b, a, data) 
+    
+    return y
+
+def filter(type_, cutoff=10, sampleRate = 6000, degree= 2 ):
+    """Function for returning the parametrized filter in function form for easy calling"""
+    def butter(responses):
+        return butter_filter(type_,responses, cutoff, sampleRate, degree)
+
+    return butter
+
+
+def filter_emg():
+    """Function for applying the full filtering process on an EMG signal"""
+    high = filter('high', cutoff=70, sampleRate = 6032, degree=2 )
+    low = filter('low',cutoff=30, sampleRate = 6032, degree=2 )
+        
+    return lambda x : low(np.abs(high(x)))
+
+
 class SynapseAPI(object):
     """Provided class for interfacing between Python and Synapse"""
     def __init__(self):
         self.stimulator = 'eStim1'  # name of the stimulator, is configuration-specific
         self.emg_buffers = [f'buffer_{i}' for i in range(1, 4)]  # buffers to read responses from
-        self.emg_index = 1  # which buffer to read the final response from
-        self.baseline_index = 4  # baseline index for aggregating responses from a single buffer
+        self.emg_index = 0  # which buffer to read the final response from
+        self.response_index = np.array(np.array([153,193])/600*3600,dtype=np.int) #time window in ms second in which to look for the response, 100 ms baseline, 43 ms stimulation
         self.synapse_api = tdt.SynapseAPI('localhost')  # API for connecting to Synapse
         self.previous_response = None  # stores the previous response from the system
 
@@ -30,6 +61,9 @@ class SynapseAPI(object):
             'amplitude': self.set_amplitude,
             'channel': self.set_channel
         }
+
+        #Filtering function for EMGs to be called when processing the content of the Synapse buffer
+        self.filter_emg = filter_emg()
 
         # Decide if to record the data as then there are configuration needs for Synapse circuits
         record = False
@@ -73,12 +107,10 @@ class SynapseAPI(object):
     def process_response_arr(self, response_arr):
         # Get responses from the previously indicated buffer only
         response_arr = response_arr[self.emg_index]
-        # Take the baseline mean via the given baseline index
-        baseline_mean = np.mean(response_arr[:self.baseline_index])
-        # Normalize the picked out responses using the baseline mean
-        response_arr = response_arr[self.baseline_index:] / baseline_mean
+        #filter the signal
+        filt_response = self.filter_emg(response_arr)
         # Return the maximum recorded response from the resultant array
-        return np.max(response_arr)
+        return np.max(response_arr[self.response_index[0]:self.response_index[1]])
 
     def read_response(self):
         def read_buffers():
