@@ -186,22 +186,22 @@ Bonizzato M., Massai E.<sup>&</sup>, Côté S.<sup>&</sup>, Quessy S., Martinez 
 ​
 10. **rho_high**:
     - **default**:
-        - Controls: The default higher bound of the prior over kernel lenghtscales.
+        - Controls: The default higher bound of the prior over kernel lengthscales.
         - Possible values: Floats
     - **values**:
         - Controls: The values that will be tested in hyperparameter optimization.
         - Possible values: List of floats
     - **find_best**:
-        - Controls: If the higher bound of the prior over kernel lenghtscales is optimized when hyperparameter optimization is called.
+        - Controls: If the higher bound of the prior over kernel lengthscales is optimized when hyperparameter optimization is called.
         - Possible values: True or False
 ​
 11. **rho_low**:
     - **default**:
-        - Controls: The default lower bound of the prior on kernel lenghtscales.
+        - Controls: The default lower bound of the prior over kernel lengthscales.
         - Possible values: Floats
     - **values**:
         - Controls: The values that will be tested in hyperparameter optimization.
         - Possible values: List of floats
     - **find_best**:
-        - Controls: If the lower bound of the prior on kernel lenghtscales is optimized when hyperparameter optimization is called.
+        - Controls: If the lower bound of the prior over kernel lengthscales is optimized when hyperparameter optimization is called.
         - Possible values: True or False
