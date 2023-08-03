@@ -164,35 +164,35 @@ Bonizzato M., Massai E.<sup>&</sup>, Côté S.<sup>&</sup>, Quessy S., Martinez 
 ​
 8. **noise_min**:
     - **default**:
-        - Controls: The default lower bound of the prior on the likelihood's noise parameter.
+        - Controls: The default lower bound of the prior over the likelihood's noise parameter.
         - Possible values: Floats
     - **values**:
         - Controls: The values that will be tested in hyperparameter optimization.
         - Possible values: List of floats
     - **find_best**:
-        - Controls: If the lower bound of the prior on the likelihood's noise parameter is optimized when hyperparameter optimization is called.
+        - Controls: If the lower bound of the prior over the likelihood's noise parameter is optimized when hyperparameter optimization is called.
         - Possible values: True or False
 ​
 9. **noise_max**:
     - **default**:
-        - Controls: The default higher bound of the prior on the likelihood's noise parameter.
+        - Controls: The default higher bound of the prior over the likelihood's noise parameter.
         - Possible values: Floats 
     - **values**:
         - Controls: The values that will be tested in hyperparameter optimization.
         - Possible values: List of floats
     - **find_best**:
-        - Controls: If the higher bound of the prior on the likelihood's noise parameter is optimized when hyperparameter optimization is called.
+        - Controls: If the higher bound of the prior over the likelihood's noise parameter is optimized when hyperparameter optimization is called.
         - Possible values: True or False
 ​
 10. **rho_high**:
     - **default**:
-        - Controls: The default higher bound of the prior on kernel lenghtscales.
+        - Controls: The default higher bound of the prior over kernel lenghtscales.
         - Possible values: Floats
     - **values**:
         - Controls: The values that will be tested in hyperparameter optimization.
         - Possible values: List of floats
     - **find_best**:
-        - Controls: If the higher bound of the prior on kernel lenghtscales is optimized when hyperparameter optimization is called.
+        - Controls: If the higher bound of the prior over kernel lenghtscales is optimized when hyperparameter optimization is called.
         - Possible values: True or False
 ​
 11. **rho_low**:
