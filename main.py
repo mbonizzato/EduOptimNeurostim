@@ -493,6 +493,8 @@ if config.step_by_step:
 
 if config.step_by_step:
     np.save(os.path.join(config.output_path, 'sbs_mapped_arr.npy'), sbs_mapped_arr)
+    np.save(os.path.join(config.output_path, 'ch2xy.npy'), system.ch2xy)
+    np.save(os.path.join(config.output_path, 'Rmean.npy'), R_mean)
     np.save(os.path.join(config.output_path, 'sbs_save_query.npy'), sbs_save_query)
     np.save(os.path.join(config.output_path, 'sbs_query_idx.npy'), sbs_query_idx.astype(int))
     np.save(os.path.join(config.output_path, 'sbs_best_query.npy'), sbs_best_query.astype(int))

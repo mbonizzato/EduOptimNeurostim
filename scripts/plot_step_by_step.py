@@ -9,10 +9,16 @@ parser.add_argument('--run1', '-r1', type=str, default=None, required=True)
 args = parser.parse_args()
 
 sbs_mapped_arr = np.load(os.path.join(args.run1,'sbs_mapped_arr.npy'))
-y_mu_mapped_arr = np.squeeze(np.load(os.path.join(args.run1,'y_mu_mapped_arr.npy')))
+R_mean = np.load(os.path.join(args.run1,'Rmean.npy'))
+ch2xy = np.load(os.path.join(args.run1,'ch2xy.npy'))
 sbs_save_query = np.load(os.path.join(args.run1,'sbs_save_query.npy'))
 sbs_query_idx = np.load(os.path.join(args.run1,'sbs_query_idx.npy'))
 sbs_best_query = np.load(os.path.join(args.run1,'sbs_best_query.npy'))
+
+# map ground truth to 2D
+gt_map = np.zeros((8,4))
+for i in range(len(R_mean)):
+    gt_map[int(ch2xy[i,0]-1),int(ch2xy[i,1]-1)] = R_mean[i]
 
 fig, ax =plt.subplots(sbs_mapped_arr.shape[1]+1,sbs_mapped_arr.shape[0], figsize=(20,12))
 
@@ -20,8 +26,8 @@ for i in range(sbs_mapped_arr.shape[0]):
     for j in range(sbs_mapped_arr.shape[1]+1):
         
         if j==0:
-            #plot ground truth
-            ax[j,i].imshow(y_mu_mapped_arr, cmap='OrRd')
+            # plot ground truth
+            ax[j,i].imshow(gt_map, cmap='OrRd')
             
             if i<2:
                 for q in range(sbs_save_query[i]):  
@@ -42,14 +48,14 @@ for i in range(sbs_mapped_arr.shape[0]):
                     ax[j,i].add_patch(circle2)
         else:
             if j==1:
-                #plot estimated map                
+                # plot estimated map                
                 ax[j,i].imshow((sbs_mapped_arr[i,j-1]-np.min(sbs_mapped_arr[:,j-1]))/(np.max(sbs_mapped_arr[-1,j-1])-np.min(sbs_mapped_arr[:,j-1])),vmin =0, vmax =1, cmap='OrRd')
 
             elif j==2:
-                #plot uncertainty
+                # plot uncertainty
                 ax[j,i].imshow((sbs_mapped_arr[i,j-1]-np.min(sbs_mapped_arr[:,j-1]))/(np.max(sbs_mapped_arr[:,j-1])-np.min(sbs_mapped_arr[:,j-1])),vmin =0, vmax =1, cmap='OrRd')
             elif j==3:
-                #plot UCB map
+                # plot UCB map
                 ax[j,i].imshow((sbs_mapped_arr[i,j-1]-np.min(sbs_mapped_arr[i,j-1]))/(np.max(sbs_mapped_arr[i,j-1])-np.min(sbs_mapped_arr[i,j-1])),vmin =0, vmax =1, cmap='OrRd')
             
          # remove tick 
