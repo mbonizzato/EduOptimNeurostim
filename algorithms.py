@@ -119,7 +119,7 @@ class GP(gpytorch.models.ExactGP):
         return gpytorch.distributions.MultivariateNormal(mean_x, covariance_x)
 
 
-def optimize(model, likelihood, training_iter, train_x, train_y, learning_rate=0.1):
+def optimize(model, likelihood, training_iter, train_x, train_y, learning_rate=0.01):
     """Optimizes GP model with the Adam optimizer and marginal log likelihood loss"""
     # Setup optimizer which will optimize GaussianLikelihood parameters
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
