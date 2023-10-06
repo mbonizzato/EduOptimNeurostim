@@ -13,7 +13,7 @@ import math
 from manager import Config
 from metrics import Metrics
 from data import get_system
-from online import get_online_api
+from online import get_online_api, plot_online
 from utils import minmaxnorm, modify_GPy, modify_gpytorch
 from algorithms import GP, PriorMeanGPy, optimize, GreedySearch
 
@@ -74,6 +74,13 @@ metrics = Metrics(config=config, shape=metrics_shape, status=status)
 # Store all channel value selections and algorithm predictions in NumPy arrays
 channel_values_arr = np.empty(metrics_shape + (system.n_dim, ))
 y_mu_arr = np.empty(metrics_shape[:-1] + (system.n_channel, ))
+
+if status == 'online':
+    
+    # we store the observed biomarker response
+    obs_response = np.empty(metrics_shape)
+    explore_online = np.empty(metrics_shape)
+    exploit_online = np.empty(metrics_shape)
 
 
 # Store step by step data in NumPy arrays
@@ -267,7 +274,8 @@ for hyperparam_index, hyperparam_option in enumerate(config.hyperparam_options):
                         R_agg[query] = response
                     elif status == 'online':
                         # Send channel values to system and get response back for the online setting
-                        response = muscle.get_response_from_query(values=system.ch2xy[query], online_api=online_api)
+                        response = muscle.get_response_from_query(values=[query], online_api=online_api)
+                        obs_response[hyperparam_index, muscle_index, run_index, repetition_index, query_index] = response
 
                     # Apply inertia if applicable
                     if config.inertia:
@@ -425,6 +433,15 @@ for hyperparam_index, hyperparam_option in enumerate(config.hyperparam_options):
                     if config.step_by_step:
                         sbs_best_query[query_index]= system.ch2xy[best_query]
 
+
+                    if status == 'online':
+                        
+                        # store online exploration and exploitation metrics
+                        explore_online[hyperparam_index, muscle_index, run_index, repetition_index, query_index] = np.max(y_mu) * max_response
+                        print(f'pred {np.max(y_mu)} max {max_response} perf {np.max(y_mu) * max_response} ')
+                        exploit_online[hyperparam_index, muscle_index, run_index, repetition_index, query_index] = y_mu[query] * max_response
+                            
+
                 if status == 'offline':
                     # Get min-max values for normalization
                     min_, max_ = np.nanmin(R_agg), np.nanmax(R_agg)
@@ -447,26 +464,35 @@ for hyperparam_index, hyperparam_option in enumerate(config.hyperparam_options):
                                    explore_perf=explore_perf,
                                    exploit_perf=exploit_perf)
 
-# Average model predictions on repetitions
-y_mu_arr = np.mean(y_mu_arr, axis=3)
+if status == 'online': 
+    
+    y_mu_mapped_arr = np.empty(((np.max(system.ch2xy[:, 0]) - np.min(system.ch2xy[:, 0])) + 1, (np.max(system.ch2xy[:, 1]) - np.min(system.ch2xy[:, 1])) + 1))
+    for channel_index in range(y_mu_arr.shape[-1]):
+        y_mu_mapped_arr[system.ch2xy[channel_index, 0] - np.min(system.ch2xy[:, 0]), system.ch2xy[channel_index, 1]- np.min(system.ch2xy[:, 1])] = y_mu_arr[0, 0, 0, 0, channel_index]
+     
+else:           
 
-# Map `y_mu` using `ch2xy` to the actual dimensions for each muscle
-y_mu_mapped_arr = np.empty(tuple(y_mu_arr.shape[:-1]) + tuple(system.shape))
-for hyperparam_index in range(y_mu_arr.shape[0]):
-    for muscle_index in range(y_mu_arr.shape[1]):
-        for run_index in range(y_mu_arr.shape[2]):
-            y_mu_mapped = np.empty(system.shape)
-            for channel_index in range(y_mu_arr.shape[3]):
-                dim_values = system.ch2xy[channel_index, :]
-                dim_index = tuple(list(set(system.ch2xy[:, i].tolist())).index(v) for i, v in enumerate(dim_values))
-                y_mu_mapped[dim_index] = y_mu_arr[hyperparam_index, muscle_index, run_index, channel_index]
-            y_mu_mapped_arr[hyperparam_index, muscle_index, run_index, :] = y_mu_mapped
+    # Average model predictions on repetitions
+    y_mu_arr = np.mean(y_mu_arr, axis=3)
 
-# Post-process the y_mu_mapped to only show valid outputs for valid regions
-if system.n_dim == 2:
-    for index in itertools.product(*[range(dim) for dim in system.shape]):
-        if index not in [tuple([xi - 1 for xi in x]) for x in system.ch2xy.tolist()]:
-            y_mu_mapped_arr[(slice(None), slice(None), slice(None)) + index] = np.nan
+    # Map `y_mu` using `ch2xy` to the actual dimensions for each muscle
+    y_mu_mapped_arr = np.empty(tuple(y_mu_arr.shape[:-1]) + tuple(system.shape))
+    for hyperparam_index in range(y_mu_arr.shape[0]):
+        for muscle_index in range(y_mu_arr.shape[1]):
+            for run_index in range(y_mu_arr.shape[2]):
+                y_mu_mapped = np.empty(system.shape)
+                for channel_index in range(y_mu_arr.shape[3]):
+                    dim_values = system.ch2xy[channel_index, :]
+                    dim_index = tuple(list(set(system.ch2xy[:, i].tolist())).index(v) for i, v in enumerate(dim_values))
+                    y_mu_mapped[dim_index] = y_mu_arr[hyperparam_index, muscle_index, run_index, channel_index]
+                y_mu_mapped_arr[hyperparam_index, muscle_index, run_index, :] = y_mu_mapped
+
+    # Post-process the y_mu_mapped to only show valid outputs for valid regions
+    if system.n_dim == 2:
+        for index in itertools.product(*[range(dim) for dim in system.shape]):
+            if index not in [tuple([xi - 1 for xi in x]) for x in system.ch2xy.tolist()]:
+                y_mu_mapped_arr[(slice(None), slice(None), slice(None)) + index] = np.nan
+                
             
             
 if config.step_by_step:
@@ -493,12 +519,20 @@ if config.step_by_step:
 
 if config.step_by_step:
     np.save(os.path.join(config.output_path, 'sbs_mapped_arr.npy'), sbs_mapped_arr)
-    np.save(os.path.join(config.output_path, 'ch2xy.npy'), system.ch2xy)
-    np.save(os.path.join(config.output_path, 'Rmean.npy'), R_mean)
     np.save(os.path.join(config.output_path, 'sbs_save_query.npy'), sbs_save_query)
     np.save(os.path.join(config.output_path, 'sbs_query_idx.npy'), sbs_query_idx.astype(int))
     np.save(os.path.join(config.output_path, 'sbs_best_query.npy'), sbs_best_query.astype(int))
 
+
+# Save online data
+if status == 'online':
+    
+    print('BEST STIMULATION CHANNEL IS: {0} AT COORDINATES: {1}'.format(np.argmax(y_mu), system.ch2xy[np.argmax(y_mu)]))
+    
+    plot_online(explore_online, exploit_online, config.output_path, y_mu_mapped_arr)
+    np.save(os.path.join(config.output_path, 'observed_response.npy'), obs_response)
+    np.save(os.path.join(config.output_path, 'explore_online.npy'), explore_online)
+    np.save(os.path.join(config.output_path, 'exploit_online.npy'), exploit_online)
 
 # Save key variables, parameters, and results
 np.save(os.path.join(config.output_path, 'y_mu_mapped_arr.npy'), y_mu_mapped_arr)

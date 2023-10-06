@@ -1,7 +1,10 @@
 import tdt
 import time
+import os
 import numpy as np
 from scipy.signal import butter,filtfilt
+
+import matplotlib.pyplot as plt
 
 
 def get_online_api(config):
@@ -102,7 +105,8 @@ class SynapseAPI(object):
         self.synapse_api.setParameterValue(self.stimulator, 'DelayC', delay)
 
     def stimulate(self):
-        self.synapse_api.setParameterValue('UIn1', 'Button1', 1)
+        self.synapse_api.setParameterValue('Button1', 'Go', 1)
+        self.synapse_api.setParameterValue('Button1', 'Go', 0)
 
     def process_response_arr(self, response_arr):
         # Get responses from the previously indicated buffer only
@@ -139,3 +143,37 @@ class SynapseAPI(object):
         self.previous_response = response
 
         return response
+
+
+def plot_online(explore_online, exploit_online,path,y_mu_mapped_arr):
+    
+        
+    x = explore_online.shape[-1]
+
+    fig,axs = plt.subplots(1,2)
+    
+    axs[0].plot(range(x), explore_online[0,0,0,0], 'k', alpha=0.9)
+    axs[0].set_title('Exploration \n (value of best predicted combination)')
+    axs[1].plot(range(x), exploit_online[0,0,0,0], 'b', alpha=0.9)
+    axs[1].set_title('Exploitation \n (stimulation efficacy)')
+    
+    for i in range(2):
+    
+        axs[i].set_xlabel('Queries')
+        axs[i].set_ylabel('Objective function value')
+    
+    plt.tight_layout()
+
+    plt.savefig(os.path.join(path, 'performance_vs_queries_online.png'))
+    plt.savefig(os.path.join(path, 'performance_vs_queries_online.svg'), format='svg')
+    plt.close('all')
+    
+    plt.imshow(y_mu_mapped_arr, cmap='OrRd')
+    plt.title('Estimated response map')
+    plt.axis('off')
+    plt.colorbar()
+    plt.tight_layout()
+    
+    plt.savefig(os.path.join(path, 'estimated_map_online.png'))
+    plt.savefig(os.path.join(path, 'estimated_map_online.svg'), format='svg')
+    

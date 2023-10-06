@@ -37,13 +37,15 @@ class OnlineMuscle(object):
     def get_response_from_query(self, values, online_api):
         # Send query to online system
         for i, param in enumerate(list(self.config.input_space.keys())):
-            online_api.set_param(param, values[i])
+            online_api.set_param(param, int(values[i]+1))
 
         # Trigger stimulation
+        user_input = input(f'\nNext parameter is {values[0]+1}; Press Enter to stimulate')
         online_api.stimulate()
 
         # Read the response
         response = online_api.read_response()
+        print(f'Response was: {response}')
 
         return response
 
@@ -120,6 +122,8 @@ class System(object):
             #Overwrite values defined above
             self.ch2xy = np.array(online_mapping['ch2xy'],dtype=np.uint8)
             self.ch2idx = self.ch2xy - 1 
+
+            self.n_dim = len(self.ch2xy.shape)
 
             muscle = OnlineMuscle(config=self.config)
             self.muscles.append(muscle)
