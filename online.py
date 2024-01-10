@@ -62,7 +62,8 @@ class SynapseAPI(object):
         # `params2fn` is a dictionary mapping param keys to functions for setting the param
         self.params2fn = {
             'amplitude': self.set_amplitude,
-            'channel': self.set_channel
+            'channel': self.set_channel,
+            'frequency': self.set_frequency
         }
 
         #Filtering function for EMGs to be called when processing the content of the Synapse buffer
@@ -91,6 +92,10 @@ class SynapseAPI(object):
 
     def set_amplitude(self, amplitude, voice='A'):
         self.synapse_api.setParameterValue(self.stimulator, f'Amp{voice}', amplitude)
+
+    def set_frequency(self, frequency, voice='A'):
+        period = 1000/frequency #convert frequency to inter-pulse period
+        self.synapse_api.setParameterValue(self.stimulator, f'Period{voice}', period)  
 
     def read_channel(self,voice='A'):
         return self.synapse_api.getParameterValue(self.stimulator, f'Chan{voice}')

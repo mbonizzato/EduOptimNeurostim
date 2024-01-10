@@ -37,10 +37,16 @@ class OnlineMuscle(object):
     def get_response_from_query(self, values, online_api):
         # Send query to online system
         for i, param in enumerate(list(self.config.input_space.keys())):
-            online_api.set_param(param, int(values[i]+1))
+            if 'channel_x' in param:    
+                channel_idx = [*self.config.input_space.keys()].index('channel_x')
+                online_api.set_param('channel', int(np.where((self.config.online_mapping==values[channel_idx:channel_idx+2]).all(axis=1))[0][0]+1))
+            elif 'channel_y' in param:
+                pass
+            else: 
+                online_api.set_param(param, self.config.input_space[param][int(values[i])])
 
         # Trigger stimulation
-        user_input = input(f'\nNext parameter is {values[0]+1}; Press Enter to stimulate')
+        user_input = input(f'\nNext parameter is {values}; Press Enter to stimulate') # Make sure this doesnt break when we add frequency in input_space 
         online_api.stimulate()
 
         # Read the response
@@ -119,11 +125,14 @@ class System(object):
             assert os.path.exists(config.mapping_electrodes_online) and config.mapping_electrodes_online.endswith('.json')
             with open(config.mapping_electrodes_online) as f:
                 online_mapping = json.load(f)
-            #Overwrite values defined above
-            self.ch2xy = np.array(online_mapping['ch2xy'],dtype=np.uint8)
-            self.ch2idx = self.ch2xy - 1 
+            self.config.online_mapping = np.array(online_mapping['ch2xy'],dtype=np.uint8)
 
-            self.n_dim = len(self.ch2xy.shape)
+            #Parameter spaces from parameters other than the electode must be scaled
+            for i in config.input_space.keys():
+                if 'channel' not in i:
+                    for idx,val in enumerate(self.config.input_space[i]):
+                        self.ch2xy[self.ch2xy==val]=idx
+
 
             muscle = OnlineMuscle(config=self.config)
             self.muscles.append(muscle)

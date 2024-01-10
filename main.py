@@ -274,7 +274,7 @@ for hyperparam_index, hyperparam_option in enumerate(config.hyperparam_options):
                         R_agg[query] = response
                     elif status == 'online':
                         # Send channel values to system and get response back for the online setting
-                        response = muscle.get_response_from_query(values=[query], online_api=online_api)
+                        response = muscle.get_response_from_query(values=system.ch2xy[query], online_api=online_api)
                         obs_response[hyperparam_index, muscle_index, run_index, repetition_index, query_index] = response
 
                     # Apply inertia if applicable
