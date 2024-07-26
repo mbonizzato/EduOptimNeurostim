@@ -5,5 +5,5 @@ tqdm~=4.45.0
 matplotlib~=3.4.2
 pandas~=1.2.5
 tdt~=0.5.3
-torch~=1.10.2
+torch>=2.2.0
 gpytorch~=1.6.0
