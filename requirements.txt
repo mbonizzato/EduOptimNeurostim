@@ -1,5 +1,5 @@
 scipy~=1.4.1
-numpy~=1.17.2
+numpy>=1.22
 gpy~=1.9.9
 tqdm~=4.45.0
 matplotlib~=3.4.2
